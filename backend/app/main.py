@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.routes import scan
+from backend.app.api.routes import scan
 
 app = FastAPI(
     title="SentinelPy",
