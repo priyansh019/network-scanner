@@ -79,7 +79,7 @@ def scan_port(port):
             print (output)
 
 
-            open_ports.append((port))
+            open_ports.append(port)
 
              # Save to report
             with open(report_path, "a") as file:
