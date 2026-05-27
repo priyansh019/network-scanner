@@ -3,24 +3,24 @@ Advanced Port Scanner Report
 Target: scanme.nmap.org
 IP Address: 45.33.32.156
 Port Range: 1 - 200
-Scan Time: 2026-05-26 20:31:09.126779
+Scan Time: 2026-05-27 21:01:35.725211
 ==================================================
 
- Port 22 OPEN | Service: ssh | Banner: SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13
- Port 80 OPEN | Service: http | Banner: HTTP/1.1 400 Bad Request
-Date: Tue, 26 May 2026 15:01:09 GMT
-Server: Apache/2.4.7 (Ubuntu)
-Content-Length: 306
-Connection: close
-Content-Type: text/html; charset=iso-8859-1
-
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-<html><head>
-<title>400 Bad Request</title>
-</head><body>
-<h1>Bad Request</h1>
-<p>Your browser sent a request that this server could not understand.<br />
-</p>
-<hr>
-<address>Apache/2.4.7 (Ubuntu) Server at scanme.nmap.org Port 80</address>
-</body></html>
+
+========================================
+PORT: 22
+SERVICE: ssh
+FINGERPRINT: OpenSSH Server
+BANNER: SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13
+STATUS: OPEN
+========================================
+
+
+========================================
+PORT: 80
+SERVICE: http
+FINGERPRINT: Apache Web Server
+BANNER: Server: Apache/2.4.7 (Ubuntu)
+STATUS: OPEN
+========================================
+

@@ -2,6 +2,7 @@ import socket
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import os
+import time
 
 # Advanced port Scanner
 print("=" * 50)
@@ -46,13 +47,54 @@ with open(report_path, "w") as file:
 
 open_ports = []
 
-def grab_banner(s):
+def grab_banner(s, port):
     try:
-        s.send(b'Hello\r\n')
-        banner = s.recv(1024).decode().strip()
-        return banner
-    except:
-        return "No banner Received"
+        # HTTP Banner Grabbing
+        if port == 80:
+            request = f"GET / HTTP/1.1\r\nHost: {target}\r\n\r\n"
+            s.send(request.encode())
+        
+            banner = s.recv(4096).decode(errors="ignore")
+
+             #Extract only important lines
+            for line in banner.splitlines():
+
+                if "Server:" in line:
+                    return line.strip()
+            return "HTTP Service Detected"
+
+        # Other services
+        else:
+            banner = s.recv(4096).decode(errors="ignore").strip()
+
+            if banner:
+                return banner
+            else:
+                return "No banner Received"    
+        
+    except Exception as e:
+        return "Banner Error"
+    
+    # Service Fingerprinting
+
+def identify_service(port, banner):
+    banner = banner.lower()
+    if "apache" in banner:
+        return "Apache Web Server" 
+    elif "openssh" in banner:
+        return "OpenSSH Server"
+    elif "ftp" in banner:
+        return "FTP Server"
+    elif "smtp" in banner:
+        return "SMTP Server"
+    elif port == 80:
+        return "HTTP Server"
+    elif port == 443:
+        return "HTTPS Server"
+    else:
+        return "Unknown Service"
+        
+# Port Scanning Function
     
 def scan_port(port):
     try:
@@ -72,10 +114,20 @@ def scan_port(port):
                 service = "Unknown Service"
 
             # Grab banner
-            banner = grab_banner(s)
+            banner = grab_banner(s, port)
 
-            output = f""" Port {port} OPEN | Service: {service} | Banner: {banner}"""
+            # Fingerprint service
+            fingerprint = identify_service(port, banner)
 
+            output = f"""
+========================================
+PORT: {port}
+SERVICE: {service}
+FINGERPRINT: {fingerprint}
+BANNER: {banner}
+STATUS: OPEN
+========================================
+"""
             print (output)
 
 
@@ -85,8 +137,12 @@ def scan_port(port):
             with open(report_path, "a") as file:
                 file.write(output + "\n")
         s.close()
-    except:
+    except Exception as e:
         pass
+
+# Start Timer
+
+start_time = time.time()
 
 # ThreadPool for concurrent scanning
 
@@ -95,12 +151,17 @@ ports = range(start, end + 1)
 with ThreadPoolExecutor(max_workers=100) as executor:
     executor.map(scan_port, ports)
 
+# End Timer
+
+end_time = time.time()
+
 # Final output
 
 print("-" * 50)
 
 print("\n[+] Scan Completed!")
-print(f"[+] Open Ports: {len(open_ports)}")
+print(f"[+] Total Open Ports: {len(open_ports)}")
+print(f"[+] Scan Duration: {round(end_time - start_time, 2)} seconds")
 print(f"[+] Report saved to: {report_path}")
 
 print("=" * 50)
