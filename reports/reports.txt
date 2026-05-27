@@ -2,18 +2,9 @@ Advanced Port Scanner Report
 ==================================================
 Target: scanme.nmap.org
 IP Address: 45.33.32.156
-Port Range: 1 - 200
-Scan Time: 2026-05-27 21:01:35.725211
+Port Range: 1 - 450
+Scan Time: 2026-05-27 21:13:58.639131
 ==================================================
-
-
-========================================
-PORT: 22
-SERVICE: ssh
-FINGERPRINT: OpenSSH Server
-BANNER: SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13
-STATUS: OPEN
-========================================
 
 
 ========================================

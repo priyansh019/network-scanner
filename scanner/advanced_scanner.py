@@ -30,10 +30,10 @@ print("\n + Scanning ...\n")
 print("-" * 50)
 
 #creates a directory to save the scan results
-if not os.path.exists("network-scanner/reports"):
-    os.makedirs("network-scanner/reports")
+if not os.path.exists("reports"):
+    os.makedirs("reports")
 
-report_path = "network-scanner/reports/reports.txt"
+report_path = "reports/reports.txt"
 
 #clears the report file if it already exists
 with open(report_path, "w") as file:
