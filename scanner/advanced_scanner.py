@@ -101,7 +101,7 @@ def scan_port(port):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         
         #timeout
-        s.settimeout(1)
+        s.settimeout(1.1)
 
         result = s.connect_ex((target_ip, port))
 
