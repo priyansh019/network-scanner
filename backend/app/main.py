@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from backend.app.api.routes import scan
+from backend.app.database import engine, Base
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="SentinelPy",
