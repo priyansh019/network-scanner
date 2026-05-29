@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from backend.app.model.scan import ScanRequest
-from backend.app.model.db_model import ScanHistory
-from backend.app.database import get_db
+from app.model.scan import ScanRequest
+from app.model.db_model import ScanHistory
+from app.database import get_db
+from app.model.scan import ScanRequest, ScanResponse
 
 router = APIRouter()
 
@@ -27,3 +28,9 @@ def start_scan(request: ScanRequest, db: Session = Depends(get_db)):
         "ports": request.ports,
         "status": scan.status
     }
+from typing import List
+
+@router.get("/scan/history", response_model=List[ScanResponse])
+def get_scan_history(db: Session = Depends(get_db)):
+    scans = db.query(ScanHistory).all()
+    return scans

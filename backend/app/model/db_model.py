@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime, timezone
-from backend.app.database import Base
+from app.database import Base
 
 class ScanHistory(Base):
     __tablename__ = "scan_history"
