@@ -7,3 +7,4 @@ Welcome to the Network Scanner project! This tool is designed to help you scan a
 Network Scanner is a comprehensive solution for identifying and monitoring network devices and their security status.
 
 Not a Full Readme file
+To be update
