@@ -1,6 +1,6 @@
 from fastapi import FastAPI
-from backend.app.api.routes import scan
-from backend.app.database import engine, Base
+from app.api.routes import scan
+from app.database import engine, Base
 
 Base.metadata.create_all(bind=engine)
 
