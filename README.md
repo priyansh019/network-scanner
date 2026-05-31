@@ -8,3 +8,4 @@ Network Scanner is a comprehensive solution for identifying and monitoring netwo
 
 creting the daily streak
 streak 1
+streak 2
