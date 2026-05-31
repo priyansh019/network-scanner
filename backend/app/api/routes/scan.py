@@ -34,3 +34,11 @@ from typing import List
 def get_scan_history(db: Session = Depends(get_db)):
     scans = db.query(ScanHistory).all()
     return scans
+from fastapi import APIRouter, Depends, HTTPException
+
+@router.get("/scan/{scan_id}", response_model=ScanResponse)
+def get_scan(scan_id: int, db: Session = Depends(get_db)):
+    scan = db.query(ScanHistory).filter(ScanHistory.id == scan_id).first()
+    if not scan:
+        raise HTTPException(status_code=404, detail="Scan not found")
+    return scan
