@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from app.api.routes import scan
 from app.database import engine, Base
+from app.config import APP_TITLE
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="SentinelPy",
+    title=APP_TITLE,
     description="Network Security Scanning Platform",
     version="0.1.0"
 )
