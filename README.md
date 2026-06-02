@@ -10,4 +10,4 @@ creating the daily streak /n
 streak 1 /n
 streak 2 /n
 streak 3 /n
-streak 4
+streak 4 /n
