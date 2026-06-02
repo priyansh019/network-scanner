@@ -9,5 +9,5 @@ Network Scanner is a comprehensive solution for identifying and monitoring netwo
 creating the daily streak /n
 streak 1 /n
 streak 2 /n
-streak 3
+streak 3 /n
 streak 4
