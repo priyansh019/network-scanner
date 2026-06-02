@@ -6,7 +6,7 @@ from app.config import APP_TITLE
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title=APP_TITLE,
+    title="SentinelPy",
     description="Network Security Scanning Platform",
     version="0.1.0"
 )
