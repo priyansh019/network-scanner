@@ -1,19 +1,37 @@
 {
   "Apache": {
+
     "2.4.49": {
       "cve": "CVE-2021-41773",
       "severity": "CRITICAL",
       "description": "Path Traversal Vulnerability",
       "exploit_available": true
+    },
+
+    "2.4.7": {
+      "cve": "TEST-CVE-2026",
+      "severity": "HIGH",
+      "description": "Test Vulnerability For Scanner",
+      "exploit_available": false
     }
+
   },
 
   "OpenSSH": {
+
     "7.2": {
       "cve": "CVE-2016-0777",
       "severity": "HIGH",
       "description": "Information Leak",
       "exploit_available": false
+    },
+
+    "8.2p1": {
+      "cve": "CVE-2020-14145",
+      "severity": "MEDIUM",
+      "description": "Observable Discrepancy Attack",
+      "exploit_available": false
     }
+
   }
 }
