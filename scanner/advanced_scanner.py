@@ -3,6 +3,10 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import os
 import time
+import json
+from version_detector import extract_version
+from cve_matcher import match_vulnerability
+from risk_classifier import classify_risk
 
 # Advanced port Scanner
 print("=" * 50)
