@@ -2,16 +2,37 @@ Advanced Port Scanner Report
 ==================================================
 Target: scanme.nmap.org
 IP Address: 45.33.32.156
-Port Range: 1 - 450
-Scan Time: 2026-05-27 21:13:58.639131
+Port Range: 1 - 100
+Scan Time: 2026-06-04 22:37:55.796933
 ==================================================
 
 
 ========================================
 PORT: 80
 SERVICE: http
-FINGERPRINT: Apache Web Server
+FINGERPRINT: Apache
+VERSION: 2.4.7
 BANNER: Server: Apache/2.4.7 (Ubuntu)
 STATUS: OPEN
 ========================================
+
+[!] VULNERABILITY FOUND
+
+CVE: TEST-CVE-2026
+SEVERITY: HIGH
+RISK: Dangerous
+DESCRIPTION: Test Vulnerability For Scanner
+EXPLOIT AVAILABLE: False
+
+
+========================================
+PORT: 22
+SERVICE: ssh
+FINGERPRINT: OpenSSH
+VERSION: 6.6.1p1
+BANNER: SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13
+STATUS: OPEN
+========================================
+
+No Known Vulnerabilities Found
 

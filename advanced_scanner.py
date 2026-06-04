@@ -127,16 +127,48 @@ def scan_port(port):
 
             # Fingerprint service
             fingerprint = identify_service(port, banner)
+            version = "Unknown"
+
+            version_info = extract_version(banner)
+
+            if version_info:
+                version = version_info["version"]
+
+            vulnerability = match_vulnerability(
+                fingerprint,
+                version,
+                vulnerability_db
+            )
 
             output = f"""
 ========================================
 PORT: {port}
 SERVICE: {service}
 FINGERPRINT: {fingerprint}
+VERSION: {version}
 BANNER: {banner}
 STATUS: OPEN
 ========================================
 """
+            if vulnerability:
+
+                risk = classify_risk(
+                    vulnerability["severity"]
+                )
+
+                output += f"""
+[!] VULNERABILITY FOUND
+
+CVE: {vulnerability['cve']}
+SEVERITY: {vulnerability['severity']}
+RISK: {risk}
+DESCRIPTION: {vulnerability['description']}
+EXPLOIT AVAILABLE: {vulnerability['exploit_available']}
+"""
+            else:
+
+                 output += "\nNo Known Vulnerabilities Found\n"
+            
             print (output)
 
 
