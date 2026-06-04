@@ -4,9 +4,9 @@ from datetime import datetime
 import os
 import time
 import json
-from version_detector import extract_version
-from cve_matcher import match_vulnerability
-from risk_classifier import classify_risk
+from modules.version_detector import extract_version
+from modules.cve_matcher import match_vulnerability
+from modules.risk_classifier import classify_risk
 
 # Advanced port Scanner
 print("=" * 50)
@@ -49,6 +49,11 @@ with open(report_path, "w") as file:
     file.write(f"Scan Time: {datetime.now()}\n")
     file.write("=" * 50 + "\n\n")
 
+# Load Vulnerability Database
+
+with open("databases/vulnerabilities.json", "r") as file:
+    vulnerability_db = json.load(file)
+
 open_ports = []
 
 def grab_banner(s, port):
@@ -84,19 +89,19 @@ def grab_banner(s, port):
 def identify_service(port, banner):
     banner = banner.lower()
     if "apache" in banner:
-        return "Apache Web Server" 
+        return "Apache" 
     elif "openssh" in banner:
-        return "OpenSSH Server"
+        return "OpenSSH"
     elif "ftp" in banner:
-        return "FTP Server"
+        return "FTP"
     elif "smtp" in banner:
-        return "SMTP Server"
+        return "SMTP"
     elif port == 80:
-        return "HTTP Server"
+        return "HTTP"
     elif port == 443:
-        return "HTTPS Server"
+        return "HTTPS"
     else:
-        return "Unknown Service"
+        return "Unknown"
         
 # Port Scanning Function
     
