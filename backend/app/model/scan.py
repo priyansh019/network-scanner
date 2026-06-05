@@ -17,3 +17,6 @@ class ScanResponse(BaseModel):
 
     class Config:
         from_attributes = True
+        
+class ScanStatusUpdate(BaseModel):
+    status: str

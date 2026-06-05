@@ -4,6 +4,7 @@ from app.model.scan import ScanRequest
 from app.model.db_model import ScanHistory
 from app.database import get_db
 from app.model.scan import ScanRequest, ScanResponse
+from app.model.scan import ScanRequest, ScanResponse, ScanStatusUpdate
 
 router = APIRouter()
 
@@ -41,4 +42,14 @@ def get_scan(scan_id: int, db: Session = Depends(get_db)):
     scan = db.query(ScanHistory).filter(ScanHistory.id == scan_id).first()
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
+    return scan
+
+@router.patch("/scan/{scan_id}/status", response_model=ScanResponse)
+def update_scan_status(scan_id: int, update: ScanStatusUpdate, db: Session = Depends(get_db)):
+    scan = db.query(ScanHistory).filter(ScanHistory.id == scan_id).first()
+    if not scan:
+        raise HTTPException(status_code=404, detail="Scan not found")
+    scan.status = update.status
+    db.commit()
+    db.refresh(scan)
     return scan
