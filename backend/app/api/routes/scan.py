@@ -53,3 +53,4 @@ def update_scan_status(scan_id: int, update: ScanStatusUpdate, db: Session = Dep
     db.commit()
     db.refresh(scan)
     return scan
+
