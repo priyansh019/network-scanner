@@ -20,3 +20,4 @@ class ScanResponse(BaseModel):
         
 class ScanStatusUpdate(BaseModel):
     status: str
+
