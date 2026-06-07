@@ -5,6 +5,8 @@ from app.model.db_model import ScanHistory
 from app.database import get_db
 from app.model.scan import ScanRequest, ScanResponse
 from app.model.scan import ScanRequest, ScanResponse, ScanStatusUpdate
+from app.model.scan import ScanRequest, ScanResponse, ScanStatusUpdate, ScanResult
+
 
 router = APIRouter()
 
@@ -53,4 +55,28 @@ def update_scan_status(scan_id: int, update: ScanStatusUpdate, db: Session = Dep
     db.commit()
     db.refresh(scan)
     return scan
+
+
+
+@router.post("/scan/{scan_id}/results")
+def submit_scan_results(scan_id: int, result: ScanResult, db: Session = Depends(get_db)):
+    scan = db.query(ScanHistory).filter(ScanHistory.id == scan_id).first()
+    if not scan:
+        raise HTTPException(status_code=404, detail="Scan not found")
+    scan.open_ports = result.open_ports
+    scan.services = result.services
+    scan.risk_level = result.risk_level
+    scan.status = "completed"
+    db.commit()
+    db.refresh(scan)
+    return {
+        "message": "Scan results saved",
+        "scan_id": scan.id,
+        "status": scan.status,
+        "open_ports": scan.open_ports,
+        "risk_level": scan.risk_level
+    }
+    
+
+
 

@@ -21,3 +21,9 @@ class ScanResponse(BaseModel):
 class ScanStatusUpdate(BaseModel):
     status: str
 
+class ScanResult(BaseModel):
+    scan_id: int
+    open_ports: list[int]
+    services: dict[str, str] = {}
+    risk_level: str = "low"
+
