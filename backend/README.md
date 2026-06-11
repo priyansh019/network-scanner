@@ -49,4 +49,13 @@ backend/
 └── README.md
 ```
 
+
 ---
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.11+
+- fastapi
+- uvicorn
