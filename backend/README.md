@@ -27,3 +27,26 @@ SentinelPy is a collaborative network security scanning platform. This repositor
 | python-dotenv | Environment variable management |
 | uv | Package management |
 | uvicorn | ASGI server |
+
+## Project Structure
+
+```
+backend/
+├── app/
+│   ├── main.py           # FastAPI entry point, middleware, startup
+│   ├── config.py         # Environment variable config
+│   ├── database.py       # SQLAlchemy engine, session, Base
+│   ├── api/
+│   │   └── routes/
+│   │       └── scan.py   # All scan-related API endpoints
+│   └── model/
+│       ├── scan.py       # Pydantic request/response models
+│       └── db_model.py   # SQLAlchemy database models
+├── migrations/           # Alembic migration files
+├── .env.example          # Environment variable template
+├── alembic.ini           # Alembic configuration
+├── pyproject.toml        # Project dependencies
+└── README.md
+```
+
+---
