@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.model.scan import ScanRequest
 from app.model.db_model import ScanHistory
@@ -33,10 +33,17 @@ def start_scan(request: ScanRequest, db: Session = Depends(get_db)):
     }
 from typing import List
 
+from fastapi import APIRouter, Depends, HTTPException, Query
+
 @router.get("/scan/history", response_model=List[ScanResponse])
-def get_scan_history(db: Session = Depends(get_db)):
-    scans = db.query(ScanHistory).all()
+def get_scan_history(
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=10, ge=1, le=100),
+    db: Session = Depends(get_db)
+):
+    scans = db.query(ScanHistory).offset(skip).limit(limit).all()
     return scans
+
 from fastapi import APIRouter, Depends, HTTPException
 
 @router.get("/scan/{scan_id}", response_model=ScanResponse)
