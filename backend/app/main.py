@@ -4,6 +4,8 @@ from fastapi.responses import JSONResponse
 from app.api.routes import scan
 from app.database import engine, Base
 from app.config import APP_TITLE, DEBUG
+from app.api.routes import scan, mock_scanner
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,6 +20,8 @@ origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+app.include_router(mock_scanner.router, prefix="/api/v1")
+
 
 app.add_middleware(
     CORSMiddleware,
