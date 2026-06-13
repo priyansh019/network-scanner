@@ -34,14 +34,27 @@ def start_scan(request: ScanRequest, db: Session = Depends(get_db)):
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import List, Optional
+
+#Add filtering to the scan history endpoint so  frontend can search scans by status and target
 
 @router.get("/scan/history", response_model=List[ScanResponse])
 def get_scan_history(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=10, ge=1, le=100),
+    status: Optional[str] = Query(default=None),
+    target: Optional[str] = Query(default=None),
     db: Session = Depends(get_db)
 ):
-    scans = db.query(ScanHistory).offset(skip).limit(limit).all()
+    query = db.query(ScanHistory)
+    
+    if status:
+        query = query.filter(ScanHistory.status == status)
+    
+    if target:
+        query = query.filter(ScanHistory.target.contains(target))
+    
+    scans = query.offset(skip).limit(limit).all()
     return scans
 
 from fastapi import APIRouter, Depends, HTTPException
