@@ -5,6 +5,8 @@ from app.api.routes import scan
 from app.database import engine, Base
 from app.config import APP_TITLE, DEBUG
 from app.api.routes import scan, mock_scanner
+from app.config import APP_TITLE, DEBUG, ALLOWED_ORIGINS
+
 
 
 Base.metadata.create_all(bind=engine)
@@ -25,7 +27,7 @@ app.include_router(mock_scanner.router, prefix="/api/v1")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins if not DEBUG else ["*"],
+    allow_origins=ALLOWED_ORIGINS if not DEBUG else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
