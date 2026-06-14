@@ -14,9 +14,16 @@ class ScanResponse(BaseModel):
     ports: str
     status: str
     created_at: datetime
+from pydantic import BaseModel, ConfigDict
 
-    class Config:
-        from_attributes = True
+class ScanResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    target: str
+    ports: str
+    status: str
+    created_at: datetime
         
 class ScanStatusUpdate(BaseModel):
     status: str
