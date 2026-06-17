@@ -3,19 +3,19 @@ from sqlalchemy.orm import Session
 from app.model.scan import ScanRequest
 from app.model.db_model import ScanHistory
 from app.database import get_db
-from app.model.scan import ScanRequest, ScanResponse
-from app.model.scan import ScanRequest, ScanResponse, ScanStatusUpdate
 from app.model.scan import ScanRequest, ScanResponse, ScanStatusUpdate, ScanResult
-
+from app.core.dependencies import get_current_user
+from app.model.db_user import User
+from typing import List, Optional
 
 router = APIRouter()
 
-@router.get("/scan/status")
-def scan_status():
-    return {"status": "ready", "message": "Scanner is ready to run"}
-
 @router.post("/scan/start")
-def start_scan(request: ScanRequest, db: Session = Depends(get_db)):
+def start_scan(
+    request: ScanRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     scan = ScanHistory(
         target=request.target,
         ports=str(request.ports),
@@ -31,12 +31,6 @@ def start_scan(request: ScanRequest, db: Session = Depends(get_db)):
         "ports": request.ports,
         "status": scan.status
     }
-from typing import List
-
-from fastapi import APIRouter, Depends, HTTPException, Query
-from typing import List, Optional
-
-#Add filtering to the scan history endpoint so  frontend can search scans by status and target
 
 @router.get("/scan/history", response_model=List[ScanResponse])
 def get_scan_history(
@@ -44,20 +38,21 @@ def get_scan_history(
     limit: int = Query(default=10, ge=1, le=100),
     status: Optional[str] = Query(default=None),
     target: Optional[str] = Query(default=None),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     query = db.query(ScanHistory)
-    
     if status:
         query = query.filter(ScanHistory.status == status)
-    
     if target:
         query = query.filter(ScanHistory.target.contains(target))
-    
     scans = query.offset(skip).limit(limit).all()
     return scans
 
-from fastapi import APIRouter, Depends, HTTPException
+
+       
+
+
 
 @router.get("/scan/{scan_id}", response_model=ScanResponse)
 def get_scan(scan_id: int, db: Session = Depends(get_db)):
