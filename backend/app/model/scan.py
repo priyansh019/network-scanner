@@ -1,12 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from datetime import datetime
+from typing import Optional
 
 class ScanRequest(BaseModel):
     target: str
     ports: list[int] = [22, 80, 443]
     
-from pydantic import BaseModel
-from datetime import datetime
-from typing import Optional
+
 
 class ScanResponse(BaseModel):
     id: int
@@ -14,7 +14,7 @@ class ScanResponse(BaseModel):
     ports: str
     status: str
     created_at: datetime
-from pydantic import BaseModel, ConfigDict
+
 
 class ScanResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
