@@ -3,8 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.api.routes import scan
 from app.database import engine, Base
-from app.config import APP_TITLE, DEBUG
-from app.api.routes import scan, mock_scanner
 from app.config import APP_TITLE, DEBUG, ALLOWED_ORIGINS
 from app.api.routes import scan, mock_scanner, auth
 

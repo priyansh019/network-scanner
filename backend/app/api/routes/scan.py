@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from app.model.scan import ScanRequest
 from app.model.db_model import ScanHistory
 from app.database import get_db
 from app.model.scan import ScanRequest, ScanResponse, ScanStatusUpdate, ScanResult
