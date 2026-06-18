@@ -1,8 +1,11 @@
 import random
-from fastapi import APIRouter, Depends, HTTPException
+import time
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
-from app.database import get_db
+from app.database import get_db, SessionLocal
 from app.model.db_model import ScanHistory
+from app.core.dependencies import get_current_user
+from app.model.db_user import User
 
 router = APIRouter()
 
@@ -22,8 +25,6 @@ SERVICES = {
     8443: "HTTPS-Alt"
 }
 
-RISK_LEVELS = ["low", "medium", "high", "critical"]
-
 def calculate_risk(open_ports: list[int]) -> str:
     dangerous_ports = [21, 23, 3306, 5432]
     if any(port in dangerous_ports for port in open_ports):
@@ -34,8 +35,31 @@ def calculate_risk(open_ports: list[int]) -> str:
         return "medium"
     return "low"
 
+def run_scan_in_background(scan_id: int):
+    db = SessionLocal()
+    try:
+        time.sleep(5)
+        scan = db.query(ScanHistory).filter(ScanHistory.id == scan_id).first()
+        if not scan:
+            return
+        open_ports = random.sample(COMMON_PORTS, random.randint(1, 6))
+        services = {str(port): SERVICES[port] for port in open_ports}
+        risk_level = calculate_risk(open_ports)
+        scan.open_ports = open_ports
+        scan.services = services
+        scan.risk_level = risk_level
+        scan.status = "completed"
+        db.commit()
+    finally:
+        db.close()
+
 @router.post("/mock/scan/{scan_id}/run")
-def run_mock_scan(scan_id: int, db: Session = Depends(get_db)):
+def run_mock_scan(
+    scan_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     scan = db.query(ScanHistory).filter(ScanHistory.id == scan_id).first()
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
@@ -44,21 +68,11 @@ def run_mock_scan(scan_id: int, db: Session = Depends(get_db)):
             status_code=400,
             detail=f"Scan already processed with status: {scan.status}"
         )
-    open_ports = random.sample(COMMON_PORTS, random.randint(1, 6))
-    services = {str(port): SERVICES[port] for port in open_ports}
-    risk_level = calculate_risk(open_ports)
-    scan.open_ports = open_ports
-    scan.services = services
-    scan.risk_level = risk_level
-    scan.status = "completed"
+    scan.status = "processing"
     db.commit()
-    db.refresh(scan)
+    background_tasks.add_task(run_scan_in_background, scan_id)
     return {
-        "message": "Mock scan completed",
-        "scan_id": scan.id,
-        "target": scan.target,
-        "open_ports": scan.open_ports,
-        "services": scan.services,
-        "risk_level": scan.risk_level,
-        "status": scan.status
+        "message": "Scan started in background",
+        "scan_id": scan_id,
+        "status": "processing"
     }
