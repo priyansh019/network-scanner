@@ -50,6 +50,11 @@ def run_scan_in_background(scan_id: int):
         scan.risk_level = risk_level
         scan.status = "completed"
         db.commit()
+    except Exception:
+        scan = db.query(ScanHistory).filter(ScanHistory.id == scan_id).first()
+        if scan:
+            scan.status = "failed"
+            db.commit()
     finally:
         db.close()
 
