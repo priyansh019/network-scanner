@@ -48,8 +48,9 @@ def get_scan_history(
     scans = query.offset(skip).limit(limit).all()
     return scans
 
-
-       
+@router.get("/scan/status")
+def scan_status():
+    return {"status": "ready", "message": "Scanner is ready to run"} 
 
 
 
