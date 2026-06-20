@@ -6,18 +6,25 @@ from app.model.scan import ScanRequest, ScanResponse, ScanStatusUpdate, ScanResu
 from app.core.dependencies import get_current_user
 from app.model.db_user import User
 from typing import List, Optional
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from fastapi import Request
+
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter()
 
 @router.post("/scan/start")
+@limiter.limit("5/minute")
 def start_scan(
-    request: ScanRequest,
+    request: Request,
+    scan_request: ScanRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
     scan = ScanHistory(
-        target=request.target,
-        ports=str(request.ports),
+        target=scan_request.target,
+        ports=str(scan_request.ports),
         status="initiated"
     )
     db.add(scan)
@@ -27,7 +34,7 @@ def start_scan(
         "message": "Scan initiated",
         "scan_id": scan.id,
         "target": scan.target,
-        "ports": request.ports,
+        "ports": scan_request.ports,
         "status": scan.status
     }
 
