@@ -14,6 +14,12 @@ limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter()
 
+@router.get("/scan/status")
+def scan_status():
+    """Check if the scanner is ready to accept requests."""
+    return {"status": "ready", "message": "Scanner is ready to run"} 
+
+
 @router.post("/scan/start")
 @limiter.limit("5/minute")
 def start_scan(
@@ -22,6 +28,8 @@ def start_scan(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    """Initiate a new network scan for a given target and ports."""
+      
     scan = ScanHistory(
         target=scan_request.target,
         ports=str(scan_request.ports),
@@ -47,6 +55,7 @@ def get_scan_history(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
+    """Retrieve paginated scan history with optional filters."""
     query = db.query(ScanHistory)
     if status:
         query = query.filter(ScanHistory.status == status)
@@ -55,14 +64,13 @@ def get_scan_history(
     scans = query.offset(skip).limit(limit).all()
     return scans
 
-@router.get("/scan/status")
-def scan_status():
-    return {"status": "ready", "message": "Scanner is ready to run"} 
+
 
 
 
 @router.get("/scan/{scan_id}", response_model=ScanResponse)
 def get_scan(scan_id: int, db: Session = Depends(get_db)):
+    """Retrieve a specific scan by its ID."""
     scan = db.query(ScanHistory).filter(ScanHistory.id == scan_id).first()
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
@@ -70,6 +78,7 @@ def get_scan(scan_id: int, db: Session = Depends(get_db)):
 
 @router.patch("/scan/{scan_id}/status", response_model=ScanResponse)
 def update_scan_status(scan_id: int, update: ScanStatusUpdate, db: Session = Depends(get_db)):
+    """Update the status of an existing scan."""
     scan = db.query(ScanHistory).filter(ScanHistory.id == scan_id).first()
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
@@ -82,6 +91,7 @@ def update_scan_status(scan_id: int, update: ScanStatusUpdate, db: Session = Dep
 
 @router.post("/scan/{scan_id}/results")
 def submit_scan_results(scan_id: int, result: ScanResult, db: Session = Depends(get_db)):
+    """Submit scanner engine results for a completed scan."""
     scan = db.query(ScanHistory).filter(ScanHistory.id == scan_id).first()
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
