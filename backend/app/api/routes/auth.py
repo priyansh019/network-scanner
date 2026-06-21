@@ -11,6 +11,7 @@ router = APIRouter()
 
 @router.post("/auth/register", response_model=TokenResponse)
 def register(user: UserRegister, db: Session = Depends(get_db)):
+    """Register a new user and return a JWT token."""
     existing = db.query(User).filter(User.email == user.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -26,6 +27,7 @@ def register(user: UserRegister, db: Session = Depends(get_db)):
 
 @router.post("/auth/login", response_model=TokenResponse)
 def login(user: UserLogin, db: Session = Depends(get_db)):
+    """Authenticate an existing user and return a JWT token."""
     db_user = db.query(User).filter(User.email == user.email).first()
     if not db_user or not verify_password(user.password, db_user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
