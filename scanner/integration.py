@@ -9,8 +9,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BACKEND_URL = os.getenv("BACKEND_URL", "https://network-scanner-1-p3wn.onrender.com")
-SCANNER_EMAIL = os.getenv("SCANNER_EMAIL", "scanner@sentinelpy.com")
-SCANNER_PASSWORD = os.getenv("SCANNER_PASSWORD", "scanner123")
+SCANNER_EMAIL = os.getenv("SCANNER_EMAIL")
+SCANNER_PASSWORD = os.getenv("SCANNER_PASSWORD")
+
+if not SCANNER_EMAIL or not SCANNER_PASSWORD:
+    raise Exception("SCANNER_EMAIL and SCANNER_PASSWORD must be set in .env file")
 
 # Token cache — avoids logging in on every request
 _token_cache = {"token": None}
