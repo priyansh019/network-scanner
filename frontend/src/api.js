@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const BASE_URL = 'https://network-scanner-1-p3wn.onrender.com/api/v1'
+
+const BASE_URL = import.meta.env.VITE_API_URL + '/api/v1'
 
 const api = axios.create({ baseURL: BASE_URL })
 
