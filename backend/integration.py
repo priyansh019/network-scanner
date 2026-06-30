@@ -112,7 +112,7 @@ def identify_service(port, banner):
         8080: "HTTP-Alt", 8443: "HTTPS-Alt",
     }
     guess = port_map.get(port)
-    return f"{guess} (assumed)" if guess else "Unknown"
+    return f"{guess} (Likely)" if guess else "Unknown"
 
 
 def scan_single_port(args):
