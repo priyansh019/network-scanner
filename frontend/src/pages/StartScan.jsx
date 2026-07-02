@@ -110,9 +110,8 @@ export default function StartScan() {
             fontSize: '12px',
             color: 'var(--muted)'
           }}>
-            <strong style={{ color: 'var(--warning)' }}>⚠ Notice:</strong> After starting a scan here,
-            run the scanner engine manually with the returned scan ID to execute the real scan.
-            The backend will save results automatically when the scanner finishes.
+            <strong style={{ color: 'var(--warning)' }}>⚠ Notice:</strong> For authorized use only — only scan
+            targets you own or have explicit permission to test.
           </div>
 
           <button
