@@ -84,22 +84,35 @@ def grab_banner(s, port, target):
 
 
 def identify_service(port, banner):
-    """Fingerprint service from banner."""
-    banner = banner.lower()
+    """Fingerprint service from banner, falling back to a port-based guess."""
+    banner = banner.lower().strip()
+
     if "apache" in banner:
         return "Apache"
-    elif "openssh" in banner:
+    elif "nginx" in banner:
+        return "Nginx"
+    elif "openssh" in banner or "ssh" in banner:
         return "OpenSSH"
     elif "ftp" in banner:
         return "FTP"
     elif "smtp" in banner:
         return "SMTP"
-    elif port == 80:
-        return "HTTP"
-    elif port == 443:
-        return "HTTPS"
-    else:
-        return "Unknown"
+    elif "mysql" in banner:
+        return "MySQL"
+    elif "postgresql" in banner or "postgres" in banner:
+        return "PostgreSQL"
+    elif "telnet" in banner:
+        return "Telnet"
+
+    # No banner match — fall back to a labeled guess, not a confirmed ID
+    port_map = {
+        21: "FTP", 22: "SSH", 23: "Telnet", 25: "SMTP", 53: "DNS",
+        80: "HTTP", 110: "POP3", 143: "IMAP", 443: "HTTPS",
+        3306: "MySQL", 3389: "RDP", 5432: "PostgreSQL",
+        8080: "HTTP-Alt", 8443: "HTTPS-Alt",
+    }
+    guess = port_map.get(port)
+    return f"{guess} (likely)" if guess else "Unknown"
 
 
 def scan_single_port(args):
