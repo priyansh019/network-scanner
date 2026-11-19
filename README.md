@@ -1,97 +1,91 @@
 # SentinelPy — Network Security Scanner
 
-SentinelPy is a full-stack network security scanning platform. It lets a user request a scan of a target IP/hostname, runs a concurrent port scanner that fingerprints services and matches them against a vulnerability database, and displays the results — open ports, detected services, and risk level — on a web dashboard.
+[![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-Frontend-61DAFB?logo=react&logoColor=20232A)](https://react.dev/)
 
-The project is split into three parts that work together:
+SentinelPy is a full-stack network security scanning platform. It accepts an IP address or hostname, performs concurrent port discovery and service fingerprinting, checks detected services against local vulnerability data, calculates a risk score, and presents the findings through a web dashboard.
 
-| Part | What it does |
-|------|---------------|
-| **Frontend** | React (Vite) dashboard for logging in, starting scans, and viewing scan history/results |
-| **Backend** | FastAPI REST API that handles auth, stores scan requests, and receives results |
-| **Scanner** | Python scanning engine that performs the actual port scan, service fingerprinting, and CVE/risk matching, then reports back to the backend |
+> **Responsible use:** Only scan systems you own or have explicit permission to test.
 
-**Live app:**
-- Live at : https://network-scanner-2-umx2.onrender.com
-- Backend API: `https://network-scanner-1-p3wn.onrender.com`
-- API Docs (Swagger): `https://network-scanner-1-p3wn.onrender.com/docs`
+## Features
 
----
+- Concurrent TCP port scanning
+- Service banner and version detection
+- Common service identification
+- Known-CVE lookup from a local vulnerability database
+- Low, medium, high, and critical risk classification
+- JWT-based authentication
+- Scan creation, history, status, and result views
+- Automatic scanner polling for queued scans
+- Separate React frontend and FastAPI backend
+- SQLite support for local development and PostgreSQL support for deployment
 
-## How it fits together
+## Architecture
 
+```text
+React + Vite Dashboard
+          │  REST / JWT
+          ▼
+FastAPI Backend ───── SQLite / PostgreSQL
+          │  pending scans and results
+          ▼
+Python Scanner ─── service fingerprints / CVE matching
 ```
-┌────────────┐        REST/JWT        ┌────────────┐        REST/JWT        ┌────────────┐
-│  Frontend  │  ───────────────────▶  │  Backend    │  ◀───────────────────  │  Scanner    │
-│  (React)   │  ◀───────────────────  │  (FastAPI)  │  ───────────────────▶  │  (Python)   │
-└────────────┘   scan requests /      └────────────┘   polls for new scans,  └────────────┘
-                  scan history                          submits results
-```
 
-1. A user registers/logs in and starts a scan from the **frontend**.
-2. The **backend** creates a scan record (status: `initiated`) and exposes it via the API.
-3. The **scanner** (running as a separate process/poller) authenticates with the backend, picks up pending scans, scans the target's ports, fingerprints services, checks them against a vulnerability database, and calculates a risk level.
-4. The scanner posts the results back to the backend, which updates the scan record.
-5. The **frontend** polls/fetches the scan history and results and renders them on the dashboard.
-
----
+1. A user registers or signs in and starts a scan.
+2. The backend stores the request and exposes it through the API.
+3. The scanner polls for pending work and performs the requested checks.
+4. The scanner returns port, service, CVE, and risk information.
+5. The dashboard retrieves and renders the updated scan results.
 
 ## Project Structure
 
-```
+```text
 network-scanner/
-├── frontend/            # React + Vite dashboard
+├── frontend/                 # React and Vite dashboard
 │   ├── src/
-│   │   ├── pages/         # Login, Register, Dashboard, StartScan, ScanHistory, ScanResult
-│   │   ├── components/    # Navbar, RiskBadge, etc.
-│   │   └── api.js         # Axios client for backend API
+│   │   ├── pages/            # Login, register, dashboard, and scan views
+│   │   └── components/       # Shared interface components
 │   └── package.json
-│
-├── backend/              # FastAPI REST API
+├── backend/                  # FastAPI REST API
 │   ├── app/
-│   │   ├── main.py            # App entry point, middleware, CORS
-│   │   ├── config.py          # Environment/config loading
-│   │   ├── database.py        # SQLAlchemy engine/session
-│   │   ├── core/               # Security (JWT) and auth dependencies
-│   │   ├── api/routes/         # auth.py, scan.py, mock_scanner.py
-│   │   └── model/              # Pydantic + SQLAlchemy models
-│   ├── migrations/         # Alembic migrations
-│   ├── render.yaml          # Render deployment config
+│   │   ├── api/routes/       # Authentication and scan endpoints
+│   │   ├── core/             # Security and application configuration
+│   │   └── models/           # Database models
+│   ├── migrations/           # Alembic migrations
 │   └── requirements.txt
-│
-├── scanner/               # Scanning engine
-│   ├── scanner.py             # Basic standalone port scanner
-│   ├── advanced_scanner.py    # CLI entry point for a full scan + backend report
-│   ├── integration.py         # Auth, scanning, fingerprinting, backend reporting
-│   ├── poller.py               # Polls backend for new scans and runs them automatically
-│   ├── modules/
-│   │   ├── version_detector.py   # Extracts service/version from banners
-│   │   ├── cve_matcher.py        # Matches service+version to known vulnerabilities
-│   │   └── risk_classifier.py    # Converts severity to a risk label
-│   └── databases/vulnerabilities.json  # Local vulnerability lookup table
-│
-├── Roadmap/                # Project planning docs (roadmap, roles, timeline)
-└── .envexample
+├── scanner/                  # Python scanning engine
+│   ├── advanced_scanner.py
+│   ├── integration.py
+│   ├── poller.py
+│   └── modules/
+├── databases/                # Local vulnerability lookup data
+├── Roadmap/                  # Project planning documents
+└── render.yaml               # Render deployment configuration
 ```
 
----
+## Technology Stack
 
-## Tech Stack
+| Area | Technologies |
+| --- | --- |
+| Frontend | React 18, React Router, Axios, Vite |
+| Backend | FastAPI, SQLAlchemy, Alembic, Pydantic, JWT |
+| Scanner | Python, sockets, ThreadPoolExecutor, requests |
+| Database | SQLite for development, PostgreSQL for deployment |
+| Deployment | Render, Gunicorn, Uvicorn |
 
-- **Frontend:** React 18, React Router, Axios, Vite
-- **Backend:** FastAPI, SQLAlchemy, Alembic, Pydantic, JWT auth, SQLite (dev), Gunicorn/Uvicorn
-- **Scanner:** Python sockets, `ThreadPoolExecutor` for concurrent port scanning, `requests` for backend integration
-- **Deployment:** Render (backend), configured via `render.yaml`
+## Prerequisites
 
----
+- Python 3.11 or newer
+- Node.js 18 or newer
+- `npm`
+- `pip` or `uv`
+- Network access to targets you are authorized to scan
 
-## Getting Started
+## Local Setup
 
-### Prerequisites
-- Python 3.11+
-- Node.js 18+
-- `uv` (or `pip`) for Python dependency management
-
-### 1. Clone the repo
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/priyansh019/network-scanner.git
@@ -99,20 +93,27 @@ cd network-scanner
 cp .envexample .env
 ```
 
-### 2. Backend
+### 2. Start the backend
 
 ```bash
 cd backend
-uv sync                     # or: pip install -r requirements.txt
-alembic upgrade head        # run database migrations
+uv sync
+alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-Backend runs at `http://127.0.0.1:8000` — interactive docs at `http://127.0.0.1:8000/docs`.
+The API is available at `http://127.0.0.1:8000`. Interactive Swagger documentation is available at `http://127.0.0.1:8000/docs`.
 
-See [`backend/README.md`](backend/README.md) for the full API reference and endpoint details.
+Alternatively, install dependencies with pip:
 
-### 3. Frontend
+```bash
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+### 3. Start the frontend
+
+Open a second terminal:
 
 ```bash
 cd frontend
@@ -120,80 +121,86 @@ npm install
 npm run dev
 ```
 
-Frontend runs at `http://127.0.0.1:5173`.
+The dashboard is available at `http://127.0.0.1:5173`.
 
-### 4. Scanner
+### 4. Start the scanner
 
-The scanner authenticates against the backend as its own "scanner account," so it needs credentials in its `.env`:
+Open a third terminal:
 
 ```bash
 cd scanner
 pip install -r requirements.txt
 ```
 
+Configure the backend URL and scanner account in `.env`, then choose a mode:
+
+```bash
+# Run an interactive scan
+python advanced_scanner.py
+
+# Poll the backend and run initiated scans automatically
+python poller.py
 ```
+
+Example environment values:
+
+```env
 BACKEND_URL=http://127.0.0.1:8000
 SCANNER_EMAIL=scanner@example.com
 SCANNER_PASSWORD=change-me
 ```
 
-Run it in one of two modes:
-
-- **On-demand:** `python advanced_scanner.py` — manually enter a `scan_id`, target, and ports.
-- **Automatic poller:** `python poller.py` — continuously polls the backend for scans with status `initiated` and runs them automatically.
-
----
-
-## Core API Endpoints (Backend)
+## API Overview
 
 | Method | Endpoint | Description |
-|--------|----------|--------------|
-| POST | `/api/v1/auth/register` | Register a new user |
-| POST | `/api/v1/auth/login` | Log in and receive a JWT |
-| GET | `/api/v1/scan/status` | Check scanner/service status |
-| POST | `/api/v1/scan/start` | Initiate a new scan |
-| GET | `/api/v1/scan/history` | List scan history |
-| GET | `/api/v1/scan/{id}` | Get a single scan by ID |
-| PATCH | `/api/v1/scan/{id}/status` | Update scan status |
-| POST | `/api/v1/scan/{id}/results` | Submit scan results (used by the scanner) |
+| --- | --- | --- |
+| `POST` | `/api/v1/auth/register` | Register a user |
+| `POST` | `/api/v1/auth/login` | Sign in and receive a JWT |
+| `GET` | `/api/v1/scan/status` | Check scanner service status |
+| `POST` | `/api/v1/scan/start` | Start a new scan |
+| `GET` | `/api/v1/scan/history` | List scan history |
+| `GET` | `/api/v1/scan/{id}` | Get a scan by ID |
+| `PATCH` | `/api/v1/scan/{id}/status` | Update scan status |
+| `POST` | `/api/v1/scan/{id}/results` | Submit scanner results |
 
-Full request/response examples are in [`backend/README.md`](backend/README.md).
+See the backend README and Swagger UI for request and response details.
 
----
-
-## What the Scanner Does
+## How the Scanner Works
 
 For each target port, the scanner:
-1. Attempts a TCP connection to check if the port is open.
-2. Grabs a service banner and fingerprints the service (Apache, Nginx, OpenSSH, MySQL, PostgreSQL, etc.), falling back to a port-based guess if no banner is available.
-3. Extracts a version number from the banner where possible.
-4. Looks up the service + version in the local vulnerability database to flag known CVEs.
-5. Classifies the resulting risk (`low`, `medium`, `high`, `critical`) per port, then rolls this up into an overall risk level for the scan.
-6. Authenticates with the backend (JWT, auto-refreshed on expiry) and posts the results.
 
----
+1. Opens a TCP connection to determine whether the port is reachable.
+2. Reads available service banners and uses a port/service map as a fallback.
+3. Extracts a service or version when possible.
+4. Matches the detected service and version against the local vulnerability database.
+5. Assigns a per-port risk level and an overall risk level for the scan.
+6. Authenticates with the backend and submits the collected results.
 
 ## Deployment
 
-The backend is deployed on **Render** using [`backend/render.yaml`](backend/render.yaml):
-- Build: `pip install uv && uv sync`
-- Start: runs Alembic migrations, then serves the app with Gunicorn + Uvicorn workers
-- Environment variables (`DATABASE_URL`, `APP_TITLE`, `DEBUG`, `SECRET_KEY`, `ALLOWED_ORIGINS`) are configured in the Render dashboard / `render.yaml`
+The backend can be deployed with `backend/render.yaml` and Render environment variables such as:
 
----
+- `DATABASE_URL`
+- `APP_TITLE`
+- `DEBUG`
+- `SECRET_KEY`
+- `ALLOWED_ORIGINS`
 
-## Team & Roles
+The frontend and backend can be deployed separately. Set the frontend API URL to the public backend URL in its deployment environment.
 
-This project was built collaboratively:
-- **Backend, Frontend & Integration:** built and wired together by Preet kasana -- the FastAPI backend, the React frontend, and the scanner-to-backend integration, plus deployment to Render.
-- **Scanner Engine:** built by  Priyansh singh — the core port scanning, service fingerprinting, and CVE/risk-matching logic in `scanner/`.
+## Contributing
 
-See the [`Roadmap/`](Roadmap) folder for the original project roadmap, role division, and timeline documents.
+1. Create a focused branch for your change.
+2. Keep backend, frontend, and scanner changes separated where practical.
+3. Add or update tests and documentation for new behavior.
+4. Run formatters and linters before opening a pull request.
+5. Never commit real credentials or private target data.
 
----
+## Team
 
-## Git Workflow
+- **Preet Kasana** — Backend, frontend, integration, and Render deployment
+- **Priyansh Singh** — Scanner engine, fingerprinting, and CVE/risk matching
 
-- Never commit directly to `main`
-- Feature work happens on dedicated branches (e.g. `backend-fastapi-setup`)
-- Open a PR for review before merging
+## License
+
+No license is currently specified for this repository.
